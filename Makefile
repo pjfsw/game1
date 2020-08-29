@@ -1,9 +1,13 @@
 CC	:= gcc
-CCFLAGS:=$(shell sdl-config --cflags) -Wall -O2
-LDFLAGS := $(shell sdl-config --libs)
-#STATIC := $(shell sdl-config --static-libs)
+CCFLAGS:=$(shell sdl2-config --cflags) -Wall -O2
+LDFLAGS := $(shell sdl2-config --libs)
+#STATIC := $(shell sdl2-config --static-libs)
 TARGET := Debug
 
 all:
 	mkdir -p $(TARGET)
 	$(CC) $(CCFLAGS) $(LDFLAGS) -o $(TARGET)/game src/*.c 
+
+clean:
+	rm $(TARGET)/*
+
