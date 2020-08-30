@@ -11,19 +11,31 @@ Game *game_create(Gui *gui) {
         game_destroy(game);
         return NULL;
     }
+    game->dx = 2.0;
+    game->dy = 0.5;
 
     return game;
 }
 
 void game_update(Game *game, Gui *gui) {
-    game->camera.x += 2.0 * deltatime();
-    game->camera.y += 0.5 * deltatime();
+    game->camera.x += game->dx * deltatime();
+    game->camera.y += game->dy * deltatime();
 
+    if (game->camera.x < 0.0) {
+        game->camera.x = 0.0;
+        game->dx = fabs(game->dx);
+    }
     if (game->camera.x > 10.0) {
-        game->camera.x -= 10.0;
+        game->camera.x = 10.0;
+        game->dx = -fabs(game->dx);
+    }
+    if (game->camera.y < 0.0) {
+        game->camera.y = 0.0;
+        game->dy = fabs(game->dy);
     }
     if (game->camera.y > 10.0) {
-        game->camera.y -= 10.0;
+        game->camera.y = 10.0;
+        game->dy = -fabs(game->dy);
     }
 
     tilemap_render(game->tilemap, gui, game->camera);

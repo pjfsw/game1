@@ -8,6 +8,8 @@
 typedef struct {
     Tilemap *tilemap;
     Vector2 camera;
+    double dx;
+    double dy;
 } Game;
 
 Game *game_create();

@@ -5,6 +5,7 @@
 #include "gui.h"
 
 typedef struct {
+    SDL_Texture *background;
     SDL_Texture *screen;
     SDL_Texture *camera_view;
     int w;
