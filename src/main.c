@@ -1,25 +1,14 @@
 #include <SDL2/SDL.h>
 #include <unistd.h>
 #include <stdio.h>
-
-#define SCRW 320
-#define SCRH 180
-
-typedef struct {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Texture *screen;
-    int w;
-    int h;
-    SDL_Rect viewport;
-} Gui;
+#include "gui.h"
+#include "game.h"
+#include "guiconst.h"
+#include "deltatime.h"
 
 void destroy_gui(Gui *gui) {
     if (NULL == gui) {
         return;
-    }
-    if (NULL != gui->screen) {
-        SDL_DestroyTexture(gui->screen);
     }
     if (NULL != gui->renderer) {
         SDL_DestroyRenderer(gui->renderer);
@@ -60,57 +49,52 @@ Gui *create_gui(int display) {
 
     Gui *gui = calloc(1, sizeof(Gui));
 
-    int scale = height/SCRH;
-    if (width/SCRW < scale) {
-        scale = width/SCRW;
-    }
-    gui->w = SCRW;
-    gui->h = SCRH;
-    gui->viewport.w = gui->w * scale;
-    gui->viewport.h = gui->h * scale;
-    gui->viewport.x = (width-gui->viewport.w)/2;
-    gui->viewport.y = (height-gui->viewport.h)/2;
-    fprintf(stderr, "Viewport %d x %d\n", gui->viewport.w, gui->viewport.h);
-
     if (NULL == (gui->window = SDL_CreateWindow(
         "Game1",
         windowPosX, windowPosY,
         width, height,
         SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP
     )) ||
-        NULL == (gui->renderer = SDL_CreateRenderer(gui->window, -1, 0)) ||
-        NULL == (gui->screen = SDL_CreateTexture(gui->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, gui->w, gui->h)
-        )) {
+        NULL == (gui->renderer = SDL_CreateRenderer(gui->window, -1, 0))) {
+        fprintf(stderr, "Failed to initialize gui: %s\n", SDL_GetError());
         destroy_gui(gui);
         return NULL;
     }
+    gui->scale = height/SCRH;
+    if (width/SCRW < gui->scale) {
+        gui->scale = width/SCRW;
+    }
+
     return gui;
 }
 
 void render_screen(Gui *gui) {
-    SDL_SetRenderDrawColor(gui->renderer, 255,0,0,255);
-    SDL_RenderDrawLine(gui->renderer, 0,0,gui->w, gui->h);
 }
 
 void game_loop(Gui *gui) {
+    int now = SDL_GetTicks();
+    Game *game = game_create(gui);
     while(1) {
         SDL_Event e;
         SDL_PollEvent(&e);
         if (e.type == SDL_QUIT) {
             break;
         }
-        SDL_SetRenderTarget(gui->renderer, gui->screen);
-        SDL_SetRenderDrawColor(gui->renderer, 10,10,10,255);
-        SDL_RenderClear(gui->renderer);
-        render_screen(gui);
 
         SDL_SetRenderTarget(gui->renderer, NULL);
         SDL_SetRenderDrawColor(gui->renderer, 0,0,0,0);
         SDL_RenderClear(gui->renderer);
-        SDL_RenderCopy(gui->renderer, gui->screen, NULL, &gui->viewport);
+
+        int then = now;
+        now = SDL_GetTicks();
+        deltatime_set((double)(now-then)/1000.0);
+
+        game_update(game, gui);
+
         SDL_RenderPresent(gui->renderer);
         SDL_Delay(2);
     }
+    game_destroy(game);
 }
 
 int main(int argc, char *argv[]) {
