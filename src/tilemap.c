@@ -34,7 +34,12 @@ Tilemap *tilemap_create(Gui *gui) {
         SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
         tilemap->w + 2 * TILE_SIZE, tilemap->h + 2 * TILE_SIZE
     )) ||
-        NULL == (tilemap->background = SDL_CreateTexture(
+        NULL == (tilemap->background1 = SDL_CreateTexture(
+            gui->renderer,
+            SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+            tilemap->w + 2 * TILE_SIZE, tilemap->h + 2 * TILE_SIZE
+        )) ||
+        NULL == (tilemap->background2 = SDL_CreateTexture(
             gui->renderer,
             SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
             tilemap->w + 2 * TILE_SIZE, tilemap->h + 2 * TILE_SIZE
@@ -94,17 +99,22 @@ void draw_grid(Tilemap *tilemap, Gui *gui, Vector2 offset, SDL_Texture *texture,
 }
 
 void tilemap_render(Tilemap *tilemap, Gui *gui, Vector2 camera) {
-    Vector2 parallax = {
-        .x = camera.x * 0.8,
-        .y = camera.y * 0.8
+    Vector2 parallax1 = {
+        .x = camera.x * 0.9,
+        .y = camera.y * 0.9
+    };
+    Vector2 parallax2 = {
+        .x = camera.x * 0.3,
+        .y = camera.y * 0.3,
     };
 
     SDL_SetRenderTarget(gui->renderer, tilemap->camera_view);
     SDL_SetRenderDrawColor(gui->renderer,0,0,0,0);
     SDL_RenderClear(gui->renderer);
 
-    draw_grid(tilemap, gui, parallax, tilemap->background, 200,0,200);
-    draw_grid(tilemap, gui, camera, tilemap->screen, 255, 255, 255);
+    draw_grid(tilemap, gui, parallax2, tilemap->background2, 30,0,30);
+    draw_grid(tilemap, gui, parallax1, tilemap->background1, 90,30,80);
+    draw_grid(tilemap, gui, camera, tilemap->screen, 120, 60, 100);
 
     SDL_SetRenderTarget(gui->renderer, NULL);
     SDL_RenderCopy(gui->renderer, tilemap->camera_view, NULL, &tilemap->viewport);
@@ -118,8 +128,11 @@ void tilemap_destroy(Tilemap *tilemap) {
     if (NULL != tilemap->camera_view) {
         SDL_DestroyTexture(tilemap->camera_view);
     }
-    if (NULL != tilemap->background) {
-        SDL_DestroyTexture(tilemap->background);
+    if (NULL != tilemap->background1) {
+        SDL_DestroyTexture(tilemap->background1);
+    }
+    if (NULL != tilemap->background2) {
+        SDL_DestroyTexture(tilemap->background2);
     }
     if (NULL != tilemap->screen) {
         SDL_DestroyTexture(tilemap->screen);
