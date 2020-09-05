@@ -6,8 +6,6 @@
 
 #include "guiconst.h"
 
-#define TILE_SIZE 32
-
 GameRenderer *game_renderer_create(Gui *gui) {
     GameRenderer *renderer = calloc(1, sizeof(GameRenderer));
     int win_w;

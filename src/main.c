@@ -78,7 +78,7 @@ void game_loop(Gui *gui) {
     while(1) {
         SDL_Event e;
         SDL_PollEvent(&e);
-        if (e.type == SDL_QUIT) {
+        if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)) {
             break;
         }
         if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) {

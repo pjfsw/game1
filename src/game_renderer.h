@@ -5,6 +5,8 @@
 #include "gui.h"
 #include "sprite.h"
 
+#define TILE_SIZE 32
+
 typedef struct {
     SDL_Texture *background1;
     SDL_Texture *background2;

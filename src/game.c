@@ -13,13 +13,13 @@ Game *game_create(Gui *gui) {
         game_destroy(game);
         return NULL;
     }
-    double w = game->game_renderer->x_tiles-2;
-    double h = game->game_renderer->y_tiles-2;
+    double w = game->game_renderer->w / TILE_SIZE;
+    double h = game->game_renderer->h / TILE_SIZE;
 
-    game->camera_bounds_top_left.x = w/2 - 0.5;
-    game->camera_bounds_top_left.y = h/2 - 0.5;
-    game->camera_bounds_bottom_right.x = w/2 + 0.5;
-    game->camera_bounds_bottom_right.y = h/2 + 0.5;
+    game->camera_bounds_top_left.x = w/2 - 0.75;
+    game->camera_bounds_top_left.y = h/2 - 0.75;
+    game->camera_bounds_bottom_right.x = w/2 + 0.25;
+    game->camera_bounds_bottom_right.y = h/2 + 0.25;
 
     return game;
 }
@@ -43,7 +43,6 @@ void game_update_camera(Game *game) {
     Vector2 *camera = &game->camera;
     Vector2 *player = &game->player.pos;
 
-
     if (player->x - camera->x < game->camera_bounds_top_left.x) {
         camera->x = player->x - game->camera_bounds_top_left.x;
     } else if (player->x - camera->x > game->camera_bounds_bottom_right.x) {
@@ -55,16 +54,12 @@ void game_update_camera(Game *game) {
         camera->y = player->y - game->camera_bounds_bottom_right.y;
     }
 
-    //camera->x = player->x - game->camera_bounds_top_left.x;
-    //camera->y = player->y - game->camera_bounds_top_left.y;
     if (camera->x < 0) {
         camera->x = 0.0;
     }
     if (camera->y < 0) {
         camera->y = 0.0;
     }
-    return;
-
 }
 
 void game_update(Game *game, Gui *gui) {
