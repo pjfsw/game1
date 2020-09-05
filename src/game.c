@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include "gui.h"
 #include "game.h"
-#include "tilemap.h"
 #include "deltatime.h"
 #include "math.h"
+#include "game_renderer.h"
 
 Game *game_create(Gui *gui) {
     Game *game = calloc(1, sizeof(Game));
-    if (NULL == (game->tilemap = tilemap_create(gui))) {
+    if (NULL == (game->game_renderer = game_renderer_create(gui))) {
         game_destroy(game);
         return NULL;
     }
@@ -38,12 +38,15 @@ void game_update(Game *game, Gui *gui) {
         game->dy = -fabs(game->dy);
     }
 
-    tilemap_render(game->tilemap, gui, game->camera);
+    game_renderer_render(game->game_renderer, gui, game->camera);
 }
 
 void game_destroy(Game *game) {
     if (NULL == game) {
         return;
+    }
+    if (NULL != game->game_renderer) {
+        game_renderer_destroy(game->game_renderer);
     }
     free(game);
 }

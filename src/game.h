@@ -1,12 +1,12 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
+#include "game_renderer.h"
 #include "gui.h"
-#include "tilemap.h"
 #include "vector.h"
 
 typedef struct {
-    Tilemap *tilemap;
+    GameRenderer *game_renderer;
     Vector2 camera;
     double dx;
     double dy;
