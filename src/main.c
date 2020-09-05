@@ -5,6 +5,7 @@
 #include "game.h"
 #include "guiconst.h"
 #include "deltatime.h"
+#include "input.h"
 
 void destroy_gui(Gui *gui) {
     if (NULL == gui) {
@@ -79,6 +80,9 @@ void game_loop(Gui *gui) {
         SDL_PollEvent(&e);
         if (e.type == SDL_QUIT) {
             break;
+        }
+        if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) {
+            input_handle_event(e);
         }
 
         SDL_SetRenderTarget(gui->renderer, NULL);

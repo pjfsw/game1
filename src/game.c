@@ -4,6 +4,8 @@
 #include "deltatime.h"
 #include "math.h"
 #include "game_renderer.h"
+#include "sprite.h"
+#include "input.h"
 
 Game *game_create(Gui *gui) {
     Game *game = calloc(1, sizeof(Game));
@@ -11,34 +13,67 @@ Game *game_create(Gui *gui) {
         game_destroy(game);
         return NULL;
     }
-    game->dx = 2.0;
-    game->dy = 0.5;
+    double w = game->game_renderer->x_tiles-2;
+    double h = game->game_renderer->y_tiles-2;
+
+    game->camera_bounds_top_left.x = w/2 - 0.5;
+    game->camera_bounds_top_left.y = h/2 - 0.5;
+    game->camera_bounds_bottom_right.x = w/2 + 0.5;
+    game->camera_bounds_bottom_right.y = h/2 + 0.5;
 
     return game;
 }
 
+void game_update_player(Game *game) {
+    double speed = 3.0;
+
+    if (input_get()->left) {
+        game->player.pos.x -= speed * deltatime();
+    } else if (input_get()->right) {
+        game->player.pos.x += speed * deltatime();
+    }
+    if (input_get()->up) {
+        game->player.pos.y -= speed * deltatime();
+    } else if (input_get()->down) {
+        game->player.pos.y += speed * deltatime();
+    }
+}
+
+void game_update_camera(Game *game) {
+    Vector2 *camera = &game->camera;
+    Vector2 *player = &game->player.pos;
+
+
+    if (player->x - camera->x < game->camera_bounds_top_left.x) {
+        camera->x = player->x - game->camera_bounds_top_left.x;
+    } else if (player->x - camera->x > game->camera_bounds_bottom_right.x) {
+        camera->x = player->x - game->camera_bounds_bottom_right.x;
+    }
+    if (player->y - camera->y < game->camera_bounds_top_left.y) {
+        camera->y = player->y - game->camera_bounds_top_left.y;
+    } else if (player->y - camera->y > game->camera_bounds_bottom_right.y) {
+        camera->y = player->y - game->camera_bounds_bottom_right.y;
+    }
+
+    //camera->x = player->x - game->camera_bounds_top_left.x;
+    //camera->y = player->y - game->camera_bounds_top_left.y;
+    if (camera->x < 0) {
+        camera->x = 0.0;
+    }
+    if (camera->y < 0) {
+        camera->y = 0.0;
+    }
+    return;
+
+}
+
 void game_update(Game *game, Gui *gui) {
-    game->camera.x += game->dx * deltatime();
-    game->camera.y += game->dy * deltatime();
+    game_update_player(game);
+    game_update_camera(game);
 
-    if (game->camera.x < 0.0) {
-        game->camera.x = 0.0;
-        game->dx = fabs(game->dx);
-    }
-    if (game->camera.x > 10.0) {
-        game->camera.x = 10.0;
-        game->dx = -fabs(game->dx);
-    }
-    if (game->camera.y < 0.0) {
-        game->camera.y = 0.0;
-        game->dy = fabs(game->dy);
-    }
-    if (game->camera.y > 10.0) {
-        game->camera.y = 10.0;
-        game->dy = -fabs(game->dy);
-    }
+    Sprite* sprites[] = { &game->player };
 
-    game_renderer_render(game->game_renderer, gui, game->camera);
+    game_renderer_render(game->game_renderer, gui, game->camera, 1, sprites);
 }
 
 void game_destroy(Game *game) {

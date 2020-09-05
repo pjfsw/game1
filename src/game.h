@@ -6,8 +6,11 @@
 #include "vector.h"
 
 typedef struct {
+    Sprite player;
     GameRenderer *game_renderer;
     Vector2 camera;
+    Vector2 camera_bounds_top_left;
+    Vector2 camera_bounds_bottom_right;
     double dx;
     double dy;
 } Game;

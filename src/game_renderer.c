@@ -30,6 +30,9 @@ GameRenderer *game_renderer_create(Gui *gui) {
     renderer->viewport.x = (win_w-renderer->viewport.w)/2;
     renderer->viewport.y = (win_h-renderer->viewport.h)/2;
 
+    renderer->x_tiles = 2 + renderer->w/TILE_SIZE;
+    renderer->y_tiles = 2 + renderer->h/TILE_SIZE;
+
     if (NULL == (renderer->screen = SDL_CreateTexture(
         gui->renderer,
         SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
@@ -64,16 +67,14 @@ GameRenderer *game_renderer_create(Gui *gui) {
 void draw_grid(GameRenderer *game_renderer, Gui *gui, Vector2 offset, SDL_Texture *texture, int r, int g, int b) {
     int startx = (int)offset.x;
     int starty = (int)offset.y;
-    int tiles_x = 2 + game_renderer->w/TILE_SIZE;
-    int tiles_y = 2 + game_renderer->h/TILE_SIZE;
 
     SDL_SetRenderTarget(gui->renderer, texture);
     SDL_SetRenderDrawColor(gui->renderer, 0,0,0,0);
     SDL_RenderClear(gui->renderer);
     SDL_SetRenderDrawColor(gui->renderer, r,g,b,255);
 
-    for (int x = 0; x < tiles_x; x++) {
-        for (int y = 0; y < tiles_y; y++) {
+    for (int x = 0; x < game_renderer->x_tiles; x++) {
+        for (int y = 0; y < game_renderer->y_tiles; y++) {
             int c = (startx+starty+x+y)%2;
             if (c) {
                 SDL_Rect rect = {
@@ -99,7 +100,8 @@ void draw_grid(GameRenderer *game_renderer, Gui *gui, Vector2 offset, SDL_Textur
 
 }
 
-void game_renderer_render(GameRenderer *game_renderer, Gui *gui, Vector2 camera) {
+void game_renderer_render(GameRenderer *game_renderer, Gui *gui, Vector2 camera,
+    int sprite_count, Sprite **sprites) {
     Vector2 parallax1 = {
         .x = camera.x * 0.9,
         .y = camera.y * 0.9
@@ -116,6 +118,38 @@ void game_renderer_render(GameRenderer *game_renderer, Gui *gui, Vector2 camera)
     draw_grid(game_renderer, gui, parallax2, game_renderer->background2, 30,0,30);
     draw_grid(game_renderer, gui, parallax1, game_renderer->background1, 90,30,80);
     draw_grid(game_renderer, gui, camera, game_renderer->screen, 120, 60, 100);
+
+    // TODO image size
+    double x_size = 32.0/(double)gui->scale;
+    double y_size = 32.0/(double)gui->scale;
+
+    SDL_Rect sprite_pos = {
+        .x = 0,
+        .y = 0,
+        .w = 32 * gui->scale,
+        .h = 32 * gui->scale
+    };
+    SDL_SetRenderTarget(gui->renderer, game_renderer->camera_view);
+    SDL_SetRenderDrawColor(gui->renderer, 255,255,0,255);
+
+    for (int i = 0; i < sprite_count; i++) {
+        if (NULL == sprites[i] ||
+            sprites[i]->pos.x + x_size < camera.x ||
+            sprites[i]->pos.y + y_size < camera.y ||
+            sprites[i]->pos.x > camera.x + (double)game_renderer->x_tiles ||
+            sprites[i]->pos.y > camera.y + (double)game_renderer->y_tiles) {
+            continue;
+        }
+
+        //fprintf(stderr, "draw\n");
+
+        double x = sprites[i]->pos.x - camera.x;
+        double y = sprites[i]->pos.y - camera.y;
+        sprite_pos.x = x * (double)(TILE_SIZE * gui->scale);
+        sprite_pos.y = y * (double)(TILE_SIZE * gui->scale);
+        SDL_RenderDrawRect(gui->renderer, &sprite_pos);
+
+    }
 
     SDL_SetRenderTarget(gui->renderer, NULL);
     SDL_RenderCopy(gui->renderer, game_renderer->camera_view, NULL, &game_renderer->viewport);
