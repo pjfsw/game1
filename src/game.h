@@ -11,6 +11,7 @@ typedef struct {
     Vector2 camera;
     Vector2 camera_bounds_top_left;
     Vector2 camera_bounds_bottom_right;
+    Tilemap *tilemap;
     double dx;
     double dy;
 } Game;

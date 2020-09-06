@@ -75,6 +75,10 @@ void render_screen(Gui *gui) {
 void game_loop(Gui *gui) {
     int now = SDL_GetTicks();
     Game *game = game_create(gui);
+    if (game == NULL) {
+        fprintf(stderr, "Failed to create game!\n");
+        return;
+    }
     while(1) {
         SDL_Event e;
         SDL_PollEvent(&e);

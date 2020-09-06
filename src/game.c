@@ -6,10 +6,12 @@
 #include "game_renderer.h"
 #include "sprite.h"
 #include "input.h"
+#include "tilemap.h"
 
 Game *game_create(Gui *gui) {
     Game *game = calloc(1, sizeof(Game));
-    if (NULL == (game->game_renderer = game_renderer_create(gui))) {
+    if (NULL == (game->game_renderer = game_renderer_create(gui)) ||
+        NULL == (game->tilemap = tilemap_load("tilemap.txt"))) {
         game_destroy(game);
         return NULL;
     }
@@ -68,12 +70,15 @@ void game_update(Game *game, Gui *gui) {
 
     Sprite* sprites[] = { &game->player };
 
-    game_renderer_render(game->game_renderer, gui, game->camera, 1, sprites);
+    game_renderer_render(game->game_renderer, gui, &game->camera, game->tilemap, 1, sprites);
 }
 
 void game_destroy(Game *game) {
     if (NULL == game) {
         return;
+    }
+    if (NULL != game->tilemap) {
+        tilemap_destroy(game->tilemap);
     }
     if (NULL != game->game_renderer) {
         game_renderer_destroy(game->game_renderer);
