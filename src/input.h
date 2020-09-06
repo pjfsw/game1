@@ -8,6 +8,9 @@ typedef struct {
     int down;
     int left;
     int right;
+    int jump;
+    int edit;
+    int save;
 } Input;
 
 void input_handle_event(SDL_Event event);

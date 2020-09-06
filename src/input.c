@@ -15,6 +15,15 @@ void input_handle_event(SDL_Event event) {
     if (event.key.keysym.scancode == SDL_SCANCODE_D || event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
         input_system_input.right = event.key.type == SDL_KEYDOWN;
     }
+    if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+        input_system_input.jump = event.key.type == SDL_KEYDOWN;
+    }
+    if (event.key.keysym.scancode == SDL_SCANCODE_F1) {
+        input_system_input.edit = event.key.type == SDL_KEYDOWN;
+    }
+    if (event.key.keysym.scancode == SDL_SCANCODE_F2) {
+        input_system_input.save = event.key.type == SDL_KEYDOWN;
+    }
 }
 
 Input *input_get() {

@@ -21,7 +21,7 @@ Tilemap *tilemap_load(char *filename) {
         int col;
         int tile;
 
-        if (3 != fscanf(f, "%04x %04x %04x\n", &row, &col, &tile)) {
+        if (3 != fscanf(f, "%08x %04x %04x\n", &row, &col, &tile)) {
             continue;
         }
         if (row == LAYER_ID && col >= 0 && col < TILE_LAYERS) {
@@ -46,7 +46,7 @@ void tilemap_save(Tilemap *tilemap, char *filename) {
         fprintf(f, "%04x %04x %04x\n", LAYER_ID, i, (int)(tilemap->layers[i].parallax * PARALLAX_SCALE));
         for (int row = 0; row < TILE_ROWS; row++) {
             for (int col = 0; col < TILE_COLUMNS; col++) {
-                int tile = tilemap->layers[i].tiles[col][row];
+                int tile = tilemap->layers[i].tiles[row][col];
                 if (tile != 0) {
                     fprintf(f, "%04x %04x %04x\n", row, col, tile);
                 }

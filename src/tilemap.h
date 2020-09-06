@@ -16,6 +16,8 @@ typedef struct {
 
 Tilemap *tilemap_load(char *filename);
 
+void tilemap_save(Tilemap *tilemap, char *filename);
+
 void tilemap_destroy(Tilemap *tilemap);
 
 

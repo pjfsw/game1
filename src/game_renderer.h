@@ -6,14 +6,14 @@
 #include "sprite.h"
 #include "tilemap.h"
 
-#define TILE_SIZE 32
-
 typedef struct {
     SDL_Texture* layers[TILE_LAYERS];
     SDL_Texture *camera_view;
     SDL_Rect viewport;
-    int w;
-    int h;
+    int win_w; // Window width in pixels
+    int win_h; // Window height in pixels
+    int w;     // Playfield width
+    int h;     // Playfield height
     int x_tiles;
     int y_tiles;
 } GameRenderer;

@@ -4,6 +4,12 @@
 #include "game_renderer.h"
 #include "gui.h"
 #include "vector.h"
+#include "tile_editor.h"
+
+typedef enum {
+    PLAY,
+    EDIT_TILES
+} Gamestate;
 
 typedef struct {
     Sprite player;
@@ -14,6 +20,10 @@ typedef struct {
     Tilemap *tilemap;
     double dx;
     double dy;
+    SDL_Rect mode_rect;
+    Gamestate state;
+    TileEditorData tile_editor_data;
+    int state_switched;
 } Game;
 
 Game *game_create();
